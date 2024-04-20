@@ -100,6 +100,7 @@ public class CounterController {
         String openid = returnInfoObject.getString("openid");
         String session_key = returnInfoObject.getString("session_key");
         System.out.println(returnInfoObject);
+        ApiResponse.ok(returnInfoObject);
       }
     }catch (Exception e){
       e.printStackTrace();
