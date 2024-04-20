@@ -1,5 +1,8 @@
 package com.tencent.wxcloudrun.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.tencent.wxcloudrun.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tencent.wxcloudrun.config.ApiResponse;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.List;
 
@@ -78,6 +83,28 @@ public class CounterController {
     } else {
       return ApiResponse.error("参数action错误");
     }
+  }
+
+  @PostMapping(value = "/api/getOpenid")
+  ApiResponse getOpenid(@RequestBody CounterRequest request) {
+    try {
+      String url = "https://api.weixin.qq.com/sns/jscode2session";
+      Map<String, String> requestUrlParam = new HashMap<String, String>();
+      requestUrlParam.put("appid", request.getAppid());  //开发者设置中的appId
+      requestUrlParam.put("secret", request.getSecret()); //开发者设置中的appSecret
+      requestUrlParam.put("js_code", request.getJs_code()); //小程序调用wx.login返回的code
+      requestUrlParam.put("grant_type", "authorization_code");    //默认参数 authorization_code
+      String result = HttpUtils.post(url,requestUrlParam);
+      if (null != result && !"".equals(result)) {
+        JSONObject returnInfoObject = JSON.parseObject(result);
+        String openid = returnInfoObject.getString("openid");
+        String session_key = returnInfoObject.getString("session_key");
+        System.out.println(returnInfoObject);
+      }
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+    return null;
   }
   
 }
